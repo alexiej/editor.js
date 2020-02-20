@@ -126,6 +126,7 @@ export default class ModificationsObserver extends Module {
     let contentMutated = false;
 
     mutationList.forEach((mutation) => {
+
       switch (mutation.type) {
         case 'childList':
         case 'subtree':
@@ -134,8 +135,10 @@ export default class ModificationsObserver extends Module {
           contentMutated = true;
           break;
         case 'attributes':
+          if (['class', 'style'].includes(mutation.attributeName)) {
+            return;
+          }
           const mutatedTarget = mutation.target as Element;
-
           /**
            * Changes on Element.ce-block usually is functional
            */
@@ -164,7 +167,6 @@ export default class ModificationsObserver extends Module {
     }
 
     this.nativeInputs = Array.from(this.Editor.UI.nodes.redactor.querySelectorAll('textarea, input, select'));
-
     this.nativeInputs.forEach((input) => this.Editor.Listeners.on(input, 'input', this.mutationDebouncer));
   }
 }
